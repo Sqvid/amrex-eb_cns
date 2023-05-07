@@ -1,4 +1,5 @@
 
+#include "AMReX_Print.H"
 #include <CNS.H>
 #include <CNS_K.H>
 #include <CNS_tagging.H>

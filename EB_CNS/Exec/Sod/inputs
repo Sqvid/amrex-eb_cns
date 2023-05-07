@@ -1,16 +1,15 @@
 amrex.fpe_trap_invalid=1
 
 max_step  = -1
-stop_time = 0.00014
+stop_time = 0.0002
 
 geometry.is_periodic = 0 0 0
 geometry.coord_sys   = 0  # 0 => cart, 1 => RZ  2=>spherical
 geometry.prob_lo     =   0.0     0.0     0.0
-#geometry.prob_hi     =   1.0     1.0     0.0
 geometry.prob_hi     =   0.2     0.2     0.0
-#amr.n_cell           =    128      128      128
+amr.n_cell           =    256 256
 #amr.n_cell           =    512      512      512
-amr.n_cell           =    800      800      800
+#amr.n_cell           =    1024 1024
 
 # >>>>>>>>>>>>>  BC FLAGS <<<<<<<<<<<<<<<<
 # 0 = Interior           3 = Symmetry
@@ -20,7 +19,7 @@ amr.n_cell           =    800      800      800
 cns.lo_bc       =  2   5   5
 cns.hi_bc       =  2   5   5
 
-cns.cfl = 0.5  # cfl number for hyperbolic system
+cns.cfl = 0.7  # cfl number for hyperbolic system
 
 cns.v = 2
 amr.v = 1
@@ -30,12 +29,14 @@ amr.loadbalance_with_workestimates = 1
 amr.loadbalance_level0_int = 1000
 
 # REFINEMENT / REGRIDDING
-amr.max_level       = 0       # maximum level number allowed
+amr.max_level       = 2       # maximum level number allowed
+cns.refine_max_dengrad_lev = 2
+cns.refine_dengrad = 0.02
 
 amr.ref_ratio       = 2 2 2 2 # refinement ratio
 amr.regrid_int      = 2 2 2 2 # how often to regrid
 amr.blocking_factor = 8
-amr.max_grid_size   = 16
+amr.max_grid_size   = 128
 amr.n_error_buf     = 0 0 0 0 # number of buffer cells in error est
 amr.grid_eff        = 0.99     # what constitutes an efficient grid
 
@@ -47,38 +48,38 @@ amr.check_int               = 100    # number of timesteps between checkpoints
 # PLOTFILES
 amr.plot_files_output = 1
 amr.plot_file         = output/plt     # root name of plotfile
-amr.plot_int          = 10      # number of timesteps between plotfiles
+amr.plot_int          = 5      # number of timesteps between plotfiles
 amr.derive_plot_vars  = pressure #x_velocity y_velocity z_velocity
 
 # EB
-#eb2.geom_type = schardin
-eb2.geom_type = sphere
+eb2.geom_type = schardin
 #eb2.geom_type = all_regular
 
-eb2.sphere_radius = 0.02
-eb2.sphere_center = 0.12 0.1 0.0
-eb2.sphere_has_fluid_inside = 0
+#eb2.geom_type = sphere
+#eb2.sphere_radius = 0.02
+#eb2.sphere_center = 0.16 0.1 0.0
+#eb2.sphere_has_fluid_inside = 0
 
 cns.refine_cutcells = 0
 
-#cns.do_visc = true
+cns.do_visc = false
 #cns.use_const_visc = true
-#cns.const_visc_mu  = 0.001
+#cns.const_visc_mu  = 5.0
 #cns.const_visc_ki  = 0.0
 #cns.const_lambda   = 0.0
 
 #cns.plm_order = 1
 #cns.plm_theta = 1
 
-#cns.eb_weights_type = 3
+cns.eb_weights_type = 3
 
 # case 1: a single box at the top y-boundary
 #cns.refine_box_lo_0 = 0.45 0.90 0.45
 #cns.refine_box_hi_0 = 0.55 0.92 0.55
 
 # case 2: two boxes, one at the top, the other at the bottom
-cns.refine_box_lo_0 = 0.45 0.85 0.45
-cns.refine_box_hi_0 = 0.55 0.99 0.55
+#cns.refine_box_lo_0 = 0.45 0.85 0.45
+#cns.refine_box_hi_0 = 0.55 0.99 0.55
 
 # case 3: similar to case 2, but the bottom box is wider
 #cns.refine_box_lo_0 = 0.45 0.85 0.45
@@ -96,10 +97,10 @@ cns.refine_box_hi_0 = 0.55 0.99 0.55
 #cns.refine_box_hi_0 = 1.0 0.92 1.0
 
 # case 6 : a box at the center
-cns.refine_box_lo_0 = 0.48 0.48 0.48
-cns.refine_box_hi_0 = 0.52 0.52 0.52
-amr.blocking_factor = 16
-amr.max_grid_size   = 64
+#cns.refine_box_lo_0 = 0.48 0.48 0.48
+#cns.refine_box_hi_0 = 0.52 0.52 0.52
+#amr.blocking_factor = 16
+#amr.max_grid_size   = 64
 
 # case 7 : refine everywhere
 #cns.refine_box_lo_0 = 0. 0. 0.
@@ -109,8 +110,8 @@ amr.max_grid_size   = 64
 #cns.hi_bc       =  2   2   2
 
 #
-cns.refine_box_lo_0 = 0.55 0.5  0.3
-cns.refine_box_hi_0 = 0.85 0.65 0.7
+#cns.refine_box_lo_0 = 0.08 0.06
+#cns.refine_box_hi_0 = 0.16 0.14
 amr.blocking_factor = 16
 amr.max_grid_size   = 64
 
