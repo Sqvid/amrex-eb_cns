@@ -1,13 +1,15 @@
 amrex.fpe_trap_invalid=1
 
 max_step  = -1
-stop_time = 0.0008
+stop_time = 0.002
 
-geometry.is_periodic = 1 0 0
+geometry.is_periodic = 1 1 0
 geometry.coord_sys   = 0  # 0 => cart, 1 => RZ  2=>spherical
 geometry.prob_lo     =   0.0     0.0     0.0
 geometry.prob_hi     =   0.2     0.2     0.0
-amr.n_cell           =    256 256
+#amr.n_cell = 64 64
+amr.n_cell = 128 128
+#amr.n_cell           =    256 256
 #amr.n_cell           =    512      512      512
 #amr.n_cell           =    1024 1024
 
@@ -23,6 +25,20 @@ cns.cfl = 0.7  # cfl number for hyperbolic system
 
 cns.v = 2
 amr.v = 1
+
+# EB
+#eb2.geom_type = schardin
+#eb2.geom_type = all_regular
+#eb2.geom_type = pipe
+#eb2.geom_type = sphere
+#eb2.sphere_radius = 0.02
+#eb2.sphere_center = 0.16 0.1 0.0
+#eb2.sphere_has_fluid_inside = 0
+
+eb2.geom_type = parser
+eb2.parser_function = "abs(y - x*tan(0.523599)) - (0.0141/cos(0.523599))"
+#eb2.parser_function = "abs(y - 0.1) - 0.0141"
+#eb2.parser_function = "max(y - (0.1 + 0.0141), (0.1 - 0.0141)- y)"
 
 # LOAD BALANCE
 amr.loadbalance_with_workestimates = 1
@@ -41,8 +57,7 @@ amr.n_error_buf     = 0 0 0 0 # number of buffer cells in error est
 amr.grid_eff        = 0.99     # what constitutes an efficient grid
 
 # CHECKPOINT FILES
-amr.checkpoint_files_output = 0
-amr.check_file              = chk    # root name of checkpoint file
+amr.checkpoint_files_output = 0 amr.check_file              = chk    # root name of checkpoint file
 amr.check_int               = 100    # number of timesteps between checkpoints
 
 # PLOTFILES
@@ -50,16 +65,6 @@ amr.plot_files_output = 1
 amr.plot_file         = output/plt     # root name of plotfile
 amr.plot_int          = 10      # number of timesteps between plotfiles
 amr.derive_plot_vars  = pressure #x_velocity y_velocity z_velocity
-
-# EB
-#eb2.geom_type = schardin
-eb2.geom_type = all_regular
-#eb2.geom_type = pipe
-
-#eb2.geom_type = sphere
-#eb2.sphere_radius = 0.02
-#eb2.sphere_center = 0.16 0.1 0.0
-#eb2.sphere_has_fluid_inside = 0
 
 cns.refine_cutcells = 0
 
@@ -73,48 +78,6 @@ cns.do_visc = false
 #cns.plm_theta = 1
 
 cns.eb_weights_type = 3
-
-# case 1: a single box at the top y-boundary
-#cns.refine_box_lo_0 = 0.45 0.90 0.45
-#cns.refine_box_hi_0 = 0.55 0.92 0.55
-
-# case 2: two boxes, one at the top, the other at the bottom
-#cns.refine_box_lo_0 = 0.45 0.85 0.45
-#cns.refine_box_hi_0 = 0.55 0.99 0.55
-
-# case 3: similar to case 2, but the bottom box is wider
-#cns.refine_box_lo_0 = 0.45 0.85 0.45
-#cns.refine_box_hi_0 = 0.55 0.99 0.55
-#
-#cns.refine_box_lo_1 = 0.45 0.08 0.35
-#cns.refine_box_hi_1 = 0.55 0.10 0.65
-
-# case 4: at the corner
-#cns.refine_box_lo_0 = 0.85 0.85 0.85
-#cns.refine_box_hi_0 = 0.99 0.99 0.99
-
-# case 5 : very wide box
-#cns.refine_box_lo_0 = 0.0 0.90 0.0
-#cns.refine_box_hi_0 = 1.0 0.92 1.0
-
-# case 6 : a box at the center
-#cns.refine_box_lo_0 = 0.48 0.48 0.48
-#cns.refine_box_hi_0 = 0.52 0.52 0.52
-#amr.blocking_factor = 16
-#amr.max_grid_size   = 64
-
-# case 7 : refine everywhere
-#cns.refine_box_lo_0 = 0. 0. 0.
-#cns.refine_box_hi_0 = 1. 1. 1.
-#geometry.is_periodic = 0 0 0
-#cns.lo_bc       =  2   2   2
-#cns.hi_bc       =  2   2   2
-
-#
-#cns.refine_box_lo_0 = 0.08 0.06
-#cns.refine_box_hi_0 = 0.16 0.14
-amr.blocking_factor = 16
-amr.max_grid_size   = 64
 
 # problem specific parameter
 #prob.p_l   = 1.0
@@ -132,4 +95,4 @@ amr.max_grid_size   = 64
 #prob.u_r   = 0.0
 
 prob.p_r = 101325
-prob.u_r = 1000
+prob.u_r = 500
