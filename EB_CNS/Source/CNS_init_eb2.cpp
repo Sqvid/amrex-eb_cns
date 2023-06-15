@@ -17,7 +17,7 @@
 
 using namespace amrex;
 
-constexpr double PI = 3.14159265358979;
+constexpr Real PI = 3.14159265358979;
 
 void
 initialize_EB2 (const Geometry& geom, const int /*required_coarsening_level*/,
@@ -44,21 +44,21 @@ initialize_EB2 (const Geometry& geom, const int /*required_coarsening_level*/,
         EB2::PlaneIF upperSlope(triangleTip, upperNorm);
         EB2::PlaneIF lowerSlope(triangleTip, lowerNorm);
 
-		auto finalShape = EB2::makeIntersection(box, upperSlope, lowerSlope);
+        auto finalShape = EB2::makeIntersection(box, upperSlope, lowerSlope);
 
-		auto gshop = EB2::makeShop(finalShape);
+        auto gshop = EB2::makeShop(finalShape);
         EB2::Build(gshop, geom, max_coarsening_level, max_coarsening_level, 4);
-	} else if (geom_type == "pipe") {
-		auto W = 0.0141;
+    } else if (geom_type == "pipe") {
+        auto W = 0.0141;
 
-		EB2::PlaneIF upperSlope(RealArray({0.1,0.1 + W}), RealArray({0, 1}));
-		EB2::PlaneIF lowerSlope(RealArray({0.1,0.1 - W}), RealArray({0, -1}));
+        EB2::PlaneIF upperSlope(RealArray({0.1,0.1 + W}), RealArray({0, 1}));
+        EB2::PlaneIF lowerSlope(RealArray({0.1,0.1 - W}), RealArray({0, -1}));
 
-		auto finalShape = EB2::makeUnion(upperSlope, lowerSlope);
+        auto finalShape = EB2::makeUnion(upperSlope, lowerSlope);
 
-		auto gshop = EB2::makeShop(finalShape);
-		EB2::Build(gshop, geom, max_coarsening_level, max_coarsening_level, 4);
-	} else {
-		EB2::Build(geom, max_coarsening_level, max_coarsening_level, 4);
-	}
+        auto gshop = EB2::makeShop(finalShape);
+        EB2::Build(gshop, geom, max_coarsening_level, max_coarsening_level, 4);
+    } else {
+        EB2::Build(geom, max_coarsening_level, max_coarsening_level, 4);
+    }
 }
