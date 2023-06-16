@@ -1,12 +1,12 @@
 amrex.fpe_trap_invalid=1
 
 max_step  = -1
-stop_time = 0.004
+stop_time = 0.0008
 
-geometry.is_periodic = 1 1 0
-geometry.coord_sys   = 0  # 0 => cart, 1 => RZ  2=>spherical
-geometry.prob_lo     =   0.0     0.0     0.0
-geometry.prob_hi     =   0.2     0.2     0.0
+geometry.is_periodic = 1 1
+geometry.coord_sys = 0  # 0 => cart, 1 => RZ  2=>spherical
+geometry.prob_lo = 0.0 0.0
+geometry.prob_hi = 0.2 0.2
 #amr.n_cell = 64 64
 amr.n_cell = 128 128
 #amr.n_cell = 256 256
@@ -21,7 +21,7 @@ amr.n_cell = 128 128
 cns.lo_bc       =  2 2
 cns.hi_bc       =  2 2
 
-cns.cfl = 0.5  # cfl number for hyperbolic system
+cns.cfl = 0.2  # cfl number for hyperbolic system
 
 cns.v = 2
 amr.v = 1
@@ -37,10 +37,9 @@ amr.v = 1
 
 eb2.geom_type = parser
 #eb2.parser_function = "abs(y - x*tan(0.52359877566667)) - (0.0141/cos(0.52359877566667))"
-#eb2.parser_function = "abs(y - x*tan(0.523599)) - (0.0141/cos(0.523599))"
-eb2.parser_function = "abs((y - 0.02) - x*tan(0.3)) - (0.0141/cos(0.3))"
-#eb2.parser_function = "abs((y - 0.05) - x*tan(0.523599)) - (0.0141/cos(0.523599))"
-#eb2.parser_function = "abs(y - 0.1) - 0.0141"
+#eb2.parser_function = "abs((y - 0.02) - x*tan(acos(-1) / 6)) - (0.0141/cos(acos(-1) / 6))"
+#eb2.parser_function = "abs((y - 0.02) - x*tan(0.3)) - (0.0141/cos(0.3))"
+eb2.parser_function = "abs(y - 0.1) - 0.0141"
 
 # LOAD BALANCE
 amr.loadbalance_with_workestimates = 1
