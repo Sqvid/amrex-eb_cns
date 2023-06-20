@@ -21,8 +21,8 @@ cns_initdata (int i, int j, int k, amrex::Array4<amrex::Real> const& state,
 	Real w = 0.0141;
 	//const Real pi = 3.141592654;
 	//Real theta = (30 * pi) / 180;
-	//Real theta = 0.3;
-	Real theta = 0;
+	Real theta = 0.3;
+	//Real theta = 0;
 
     const Real* prob_lo = geomdata.ProbLo();
     const Real* dx      = geomdata.CellSize();
@@ -40,10 +40,11 @@ cns_initdata (int i, int j, int k, amrex::Array4<amrex::Real> const& state,
 	Real rho0 = 1.225, d = 0.08;// + v*0.0008;
 
 	Real g {};
-	Real centre = 0.1;
+	Real centre = 0.05;
 	Real p = y - centre - x*std::tan(theta);
 	Real b = w / std::cos(theta);
 
+	// TODO: Test dx modification for non-zero angles.
 	if (p > -b - dx[0] && p < b + dx[0]) {
 		g = (xRot - d) / (Real(0.5) * w);
 		rhot = rho0 + std::exp(-g*g);
@@ -57,12 +58,10 @@ cns_initdata (int i, int j, int k, amrex::Array4<amrex::Real> const& state,
     state(i,j,k,URHO) = rhot;
     state(i,j,k,UMX) = rhot*uxt;
     state(i,j,k,UMY) = rhot*uyt;
-#if (AMREX_SPACEDIM == 3)
-    state(i,j,k,UMZ) = Real(0.0);
-#endif
     Real et = Pt/(parm.eos_gamma-Real(1.0));
     state(i,j,k,UEINT) = et;
-    state(i,j,k,UEDEN) = et + Real(0.5)*rhot*(uxt*uxt + uyt*uyt);
+    //state(i,j,k,UEDEN) = et + Real(0.5)*rhot*(uxt*uxt + uyt*uyt);
+    state(i,j,k,UEDEN) = et + Real(0.5)*rhot*v*v;
     state(i,j,k,UTEMP) = Real(0.0);
 }
 

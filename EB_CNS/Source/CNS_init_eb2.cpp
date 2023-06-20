@@ -49,10 +49,11 @@ initialize_EB2 (const Geometry& geom, const int /*required_coarsening_level*/,
         auto gshop = EB2::makeShop(finalShape);
         EB2::Build(gshop, geom, max_coarsening_level, max_coarsening_level, 4);
     } else if (geom_type == "pipe") {
-        auto W = 0.0141;
+        Real W = 0.0141;
+		Real theta = 0.3;
 
-        EB2::PlaneIF upperSlope(RealArray({0.1,0.1 + W}), RealArray({0, 1}));
-        EB2::PlaneIF lowerSlope(RealArray({0.1,0.1 - W}), RealArray({0, -1}));
+        EB2::PlaneIF upperSlope(RealArray({0, 0.02 + W}), RealArray({-std::sin(theta), std::cos(theta)}));
+        EB2::PlaneIF lowerSlope(RealArray({0, 0.02}), RealArray({std::sin(theta), -std::cos(theta)}));
 
         auto finalShape = EB2::makeUnion(upperSlope, lowerSlope);
 
