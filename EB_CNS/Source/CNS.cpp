@@ -1,5 +1,13 @@
 
+#include "AMReX_Array4.H"
+#include "AMReX_EBCellFlag.H"
+#include "AMReX_EBSupport.H"
+#include "AMReX_FArrayBox.H"
+#include "AMReX_FabArray.H"
+#include "AMReX_FabFactory.H"
+#include "AMReX_MFIter.H"
 #include "AMReX_Print.H"
+#include "AMReX_REAL.H"
 #include <CNS.H>
 #include <CNS_K.H>
 #include <CNS_tagging.H>
@@ -107,10 +115,15 @@ CNS::initData ()
     ProbParm const* lprobparm = d_prob_parm;
 
     auto const& sma = S_new.arrays();
+
+    auto const& fact = dynamic_cast<EBFArrayBoxFactory const&>(S_new.Factory());
+    auto const& flags = fact.getMultiEBCellFlagFab();
+	auto const& fa = flags.arrays();
+
     amrex::ParallelFor(S_new,
     [=] AMREX_GPU_DEVICE (int box_no, int i, int j, int k) noexcept
     {
-        cns_initdata(i, j, k, sma[box_no], geomdata, *lparm, *lprobparm);
+        cns_initdata(i, j, k, sma[box_no], fa[box_no], geomdata, *lparm, *lprobparm);
     });
 
     // Compute the initial temperature (will override what was set in initdata)
