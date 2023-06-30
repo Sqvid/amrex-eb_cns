@@ -26,22 +26,7 @@ cns_initdata (int i, int j, int k, amrex::Array4<amrex::Real> const& state,
 	auto typ = fa(i, j, k);
 
 	Real w = 0.0141;
-	//const Real pi = 3.141592654;
-	//Real theta = (30 * pi) / 180;
 	Real theta = 0.3;
-	//Real theta = 0;
-
-	//auto flag = fa(i, j, k);
-
-	//if (flag.isCovered()) {
-	//	amrex::Print() << "0, ";
-	//} else if (flag.isSingleValued()) {
-	//	amrex::Print() << "0.5, ";
-	//} else if (flag.isRegular()) {
-	//	amrex::Print() << "1, ";
-	//} else {
-	//	amrex::Print() << "?, ";
-	//}
 
     const Real* prob_lo = geomdata.ProbLo();
     const Real* dx      = geomdata.CellSize();
@@ -51,28 +36,21 @@ cns_initdata (int i, int j, int k, amrex::Array4<amrex::Real> const& state,
 
 	Real xRot {}, yRot {}, xFulc {0}, yFulc {0};
 	xRot = (x - xFulc)*std::cos(theta) + (y - yFulc)*std::sin(theta);
-//	yRot = -(x - xFulc)*std::sin(theta) + (y - yFulc)*std::cos(theta);
 
     Real Pt, rhot, uxt, uyt;
 	Pt = prob_parm.p_r;
 	Real v = prob_parm.u_r;
-	Real rho0 = 1.225, d = 0.08 + v*0.0008;
 
-	Real g {};
-	Real centre = 0.05;
-	Real p = y - centre - x*std::tan(theta);
-	Real b = w / std::cos(theta);
+	Real rho0 = 1.225, d = 0.08;// + v*0.0015;
 
+	// Incline-pipe initial condition.
 	// If the cell is covered then do not set it to a gaussian value.
 	if (typ.isCovered()) {
 		rhot = rho0;
 
-	} else if (p > -b - dx[0] && p < b + dx[0]) {
-		g = (xRot - d) / (Real(0.5) * w);
-		rhot = rho0 + std::exp(-g*g);
-
 	} else {
-		rhot = rho0;
+		Real g = (xRot - d) / (Real(0.5) * w);
+		rhot = rho0 + std::exp(-g*g);
 	}
 
 	uxt = v * std::cos(theta);
