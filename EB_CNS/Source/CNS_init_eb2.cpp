@@ -11,6 +11,7 @@
 #include <AMReX_EB2_IF.H>
 
 #include <AMReX_ParmParse.H>
+#include "AMReX_Print.H"
 
 #include <cmath>
 #include <algorithm>
@@ -27,7 +28,11 @@ initialize_EB2 (const Geometry& geom, const int /*required_coarsening_level*/,
 
     ParmParse ppeb2("eb2");
     std::string geom_type;
+    bool build_coarse_level_by_coarsening {};
     ppeb2.get("geom_type", geom_type);
+    ppeb2.get("build_coarse_level_by_coarsening", build_coarse_level_by_coarsening);
+
+	amrex::AllPrint() << build_coarse_level_by_coarsening;
 
     if (geom_type == "schardin") {
         RealArray triangleTip({0.1, 0.1});
@@ -47,7 +52,7 @@ initialize_EB2 (const Geometry& geom, const int /*required_coarsening_level*/,
         auto finalShape = EB2::makeIntersection(box, upperSlope, lowerSlope);
 
         auto gshop = EB2::makeShop(finalShape);
-        EB2::Build(gshop, geom, max_coarsening_level, max_coarsening_level, 4);
+        EB2::Build(gshop, geom, max_coarsening_level, max_coarsening_level, 4, build_coarse_level_by_coarsening);
     } else if (geom_type == "pipe") {
         Real W = 0.0141;
 		Real theta = 0.3;
@@ -58,8 +63,8 @@ initialize_EB2 (const Geometry& geom, const int /*required_coarsening_level*/,
         auto finalShape = EB2::makeUnion(upperSlope, lowerSlope);
 
         auto gshop = EB2::makeShop(finalShape);
-        EB2::Build(gshop, geom, max_coarsening_level, max_coarsening_level, 4);
+        EB2::Build(gshop, geom, max_coarsening_level, max_coarsening_level, 4, build_coarse_level_by_coarsening);
     } else {
-        EB2::Build(geom, max_coarsening_level, max_coarsening_level, 4, true, false);
+        EB2::Build(geom, max_coarsening_level, max_coarsening_level, 4, build_coarse_level_by_coarsening, false);
     }
 }
