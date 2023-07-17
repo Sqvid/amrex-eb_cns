@@ -1,7 +1,7 @@
 #!/bin/env bash
 
 # Parallelisation parameters.
-nCores=6
+nCores=32
 threadsPerCore=2
 nThreads=$((nCores * threadsPerCore))
 makeFlags="-j ${nCores} DIM=2"
@@ -14,22 +14,25 @@ mpiTest="USE_MPI=TRUE"
 mpiOmpTest="${mpiTest} USE_OMP=TRUE"
 mpiCudaTest="${mpiTest} USE_CUDA=TRUE"
 
-amrMaxLevel=2
+refRatio="2 2 2 2"
+amrMaxLevel=$(echo ${refRatio} | wc -w)
+#amrMaxLevel=0
+echo "${amrMaxLevel} LEVELS"
 blockingFactor=8
 maxGridSize=128
-refineDengrad=0.02
+refineDengrad=0.005
 
 runTimeTest() {
 	testname=${1}
 	#resolutions="64 128 256 512 1024 2048 4096"
-	resolutions="128 256 512"
+	resolutions="64"
 
 	# Tests are repeated for different resolutions multiple times.
 	for res in ${resolutions}; do
-		for run in {1..3}; do
+		for run in {1..1}; do
 			case ${testname} in
 				${mpiTest})
-					outfile=time_MPI_${res}_${run}
+					outfile=time_MPI_${res}
 					mpiProcs=${nCores}
 					bin=${mpiBin}
 					;;
@@ -42,11 +45,11 @@ runTimeTest() {
 					export OMP_NUM_THREADS=${ompThreads}
 					export OMP_WAIT_POLICY=active
 					export OMP_DISPLAY_ENV=true
-					outfile=time_MPI_${mpiProcs}_OMP_${ompThreads}_${res}_${run}
+					outfile=time_MPI_${mpiProcs}_OMP_${ompThreads}_${res}
 					;;
 
 				${mpiCudaTest})
-					outfile=time_MPI_CUDA_${res}_${run}
+					outfile=time_MPI_CUDA_${res}
 					mpiProcs=2
 					bin=${mpiCudaBin}
 					makeFlags="${makeFlags} CUDA_ARCH=8.0"
@@ -56,6 +59,12 @@ runTimeTest() {
 					exit 1
 					;;
 			esac
+
+			if [ ${amrMaxLevel} -gt 0 ]; then
+				outfile=${outfile}_AMR_$(echo ${refRatio} | sed 's/ /-/g')
+			fi
+
+			outfile=${outfile}_${run}
 
 			make ${makeFlags} ${testname}
 
@@ -88,6 +97,7 @@ runTimeTest() {
 				cns.refine_dengrad=${refineDengrad} \
 				amr.blocking_factor=${blockingFactor} \
 				amr.max_grid_size=${maxGridSize} \
+				amr.ref_ratio=${refRatio} \
 				> ${outfile} 2>&1
 
 			if [ "${?}" != "0" ]; then
@@ -103,7 +113,7 @@ runTimeTest() {
 if [ "${#}" == "0" ]; then
 	#for testname in "${mpiTest}" "${mpiOmpTest}" "${mpiCudaTest}"; do
 	#for testname in "${mpiOmpTest}"; do
-	for testname in "${mpiTest}" "${mpiOmpTest}"; do
+	for testname in "${mpiTest}"; do
 		runTimeTest "${testname}"
 	done
 
