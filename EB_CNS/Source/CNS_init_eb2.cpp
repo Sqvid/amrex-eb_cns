@@ -32,8 +32,6 @@ initialize_EB2 (const Geometry& geom, const int /*required_coarsening_level*/,
     ppeb2.get("geom_type", geom_type);
     ppeb2.get("build_coarse_level_by_coarsening", build_coarse_level_by_coarsening);
 
-	amrex::AllPrint() << build_coarse_level_by_coarsening;
-
     if (geom_type == "schardin") {
         RealArray triangleTip({0.1, 0.1});
         RealArray llCorner({0.1, 0.09});
