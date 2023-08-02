@@ -1,16 +1,16 @@
 amrex.fpe_trap_invalid=1
 
-max_step  = -1
-stop_time = 0.0002
+max_step  = 0
+stop_time = 0.0015
 
 geometry.is_periodic = 0 0
 geometry.coord_sys = 0  # 0 => cart, 1 => RZ  2=>spherical
 geometry.prob_lo = 0.0 0.0
 geometry.prob_hi = 0.2 0.2
-#amr.n_cell = 64 64
+amr.n_cell = 64 64
 #amr.n_cell = 128 128
 #amr.n_cell = 256 256
-amr.n_cell = 512 512
+#amr.n_cell = 512 512
 #amr.n_cell = 1024 1024
 
 # >>>>>>>>>>>>> BC FLAGS <<<<<<<<<<<<<<<<
@@ -27,20 +27,16 @@ cns.v = 2
 amr.v = 1
 
 # EB
-eb2.geom_type = schardin
+#eb2.geom_type = schardin
 #eb2.geom_type = all_regular
 #eb2.geom_type = pipe
 #eb2.geom_type = sphere
 #eb2.sphere_radius = 0.02
-#eb2.sphere_center = 0.16 0.1 0.0
+#eb2.sphere_center = 0.12 0.1 0.0
 #eb2.sphere_has_fluid_inside = 0
 
-#eb2.geom_type = parser
-#eb2.parser_function = "abs(y - x*tan(0.52359877566667)) - (0.0141/cos(0.52359877566667))"
-#eb2.parser_function = "abs((y - 0.02) - x*tan(acos(-1) / 6)) - (0.0141/cos(acos(-1) / 6))"
-#eb2.parser_function = "abs((y - 0.05) - x*tan(0.3)) - (0.0141/cos(0.3))"
-#eb2.parser_function = "abs((y - 0.05) - x*tan(0.1)) - (0.0141/cos(0.1))"
-#eb2.parser_function = "abs(y - 0.1) - 0.0141"
+eb2.geom_type = parser
+eb2.parser_function = "abs((y - 0.05) - x*tan(0.3)) - (0.0141/cos(0.3))"
 
 #eb2.extend_domain_face=0
 eb2.build_coarse_level_by_coarsening=false
@@ -50,11 +46,11 @@ amr.loadbalance_with_workestimates = 1
 amr.loadbalance_level0_int = 1000
 
 # REFINEMENT / REGRIDDING
-amr.max_level       = 2       # maximum level number allowed
-cns.refine_max_dengrad_lev = 2
+amr.max_level       = 0       # maximum level number allowed
+cns.refine_max_dengrad_lev = 0
 cns.refine_dengrad = 0.005
 
-amr.ref_ratio       = 2 2 # refinement ratio
+amr.ref_ratio       = 4 # refinement ratio
 amr.regrid_int      = 2 2 2 2 # how often to regrid
 amr.blocking_factor = 16
 amr.max_grid_size   = 128
@@ -80,7 +76,7 @@ cns.do_visc = false
 #cns.const_visc_ki  = 0.0
 #cns.const_lambda   = 0.0
 
-cns.plm_iorder = 2
+cns.plm_iorder = 1
 #cns.plm_theta = 1
 
 cns.eb_weights_type = 3
@@ -93,12 +89,12 @@ cns.eb_weights_type = 3
 #prob.u_l   = 0.0
 #prob.u_r   = 0.0
 
-prob.p_l   = 96400
-prob.p_r   = 50000
-prob.rho_l = 0.944
-prob.rho_r = 0.595
-prob.u_l   = 169.68
-prob.u_r   = 0.0
+#prob.p_l   = 96400
+#prob.p_r   = 50000
+#prob.rho_l = 0.944
+#prob.rho_r = 0.595
+#prob.u_l   = 169.68
+#prob.u_r   = 0.0
 
-#prob.p_r = 101325
-#prob.u_r = 30
+prob.p_r = 101325
+prob.u_r = 30
