@@ -1,9 +1,9 @@
 #!/bin/env bash
 
-nCores=6
-threadsPerCore=2
+nCores=32
+threadsPerCore=1
 nThreads=$((nCores * threadsPerCore))
-binName=./CNS2d.gnu.MPI.ex
+binName=./CNS3d.gnu.MPI.ex
 #binName=./CNS2d.gnu.DEBUG.MPI.ex
 visitFile=plot.visit
 
