@@ -37,7 +37,8 @@ runTimeTest() {
         for run in $(seq ${nRuns}); do
                 case ${testname} in
                         ${mpiTest})
-                                mpiProcs=${nCores}
+                                mpiProcs=${threads}
+                                #mpiProcs=${nCores}
                                 outfile=time_MPI-${mpiProcs}_${res}
                                 bin=${mpiBin}
                                 ;;
@@ -57,7 +58,8 @@ runTimeTest() {
 
                         ${ompTest})
                                 bin=${ompBin}
-                                ompThreads=32
+                                ompThreads=${threads}
+                                #ompThreads=${nCores}
                                 export OMP_NUM_THREADS=${ompThreads}
                                 export OMP_WAIT_POLICY=active
                                 export OMP_PROC_BIND=false
@@ -145,7 +147,7 @@ runTimeTest() {
 }
 
 if [ "${#}" == "0" ]; then
-        for res in 64 128; do
+        for res in 512; do
         #for res in 64 128 256 512 1024 2048 4096; do
 		echo ${res}
                 effective=${res}
@@ -156,9 +158,11 @@ if [ "${#}" == "0" ]; then
                 maxGridSize=128
 
                 #for testname in "${mpiTest}"; do
-                #for testname in "${mpiTest}" "${ompTest}"; do
-                for testname in "${mpiTest}" "${ompTest}" "${mpiOmpTest}" "${cuda1Test}" "${cuda2Test}"; do
-                        runTimeTest "${testname}" ${res}
+                for testname in "${mpiTest}" "${ompTest}"; do
+                #for testname in "${mpiTest}" "${ompTest}" "${mpiOmpTest}" "${cuda1Test}" "${cuda2Test}"; do
+			for i in $(seq ${nCores}); do
+				threads=${i} runTimeTest "${testname}" ${res}
+			done
                 done
         done
 
