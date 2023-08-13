@@ -36,8 +36,8 @@ runTimeTest() {
 	for run in $(seq ${nRuns}); do
 		case ${testname} in
 			${mpiTest})
-				outfile=time_MPI_${nCores}_${res}
 				mpiProcs=${nCores}
+				outfile=time_MPI-${mpiProcs}_${res}
 				bin=${mpiBin}
 				;;
 
@@ -50,7 +50,7 @@ runTimeTest() {
 				export OMP_WAIT_POLICY=active
 				export OMP_PROC_BIND=false
 				export OMP_DISPLAY_ENV=true
-				outfile=time_MPI_${mpiProcs}_OMP_${ompThreads}_${res}
+				outfile=time_MPI-${mpiProcs}_OMP-${ompThreads}_${res}
 				#outfile=time_OMP_${ompThreads}_${res}
 				;;
 
@@ -65,8 +65,8 @@ runTimeTest() {
 				;;
 
 			${mpiCudaTest})
-				mpiProcs=2
-				outfile=time_MPI_${mpiProcs}_CUDA_${res}
+				mpiProcs=1
+				outfile=time_CUDA-${mpiProcs}_${res}
 				bin=${mpiCudaBin}
 				makeFlags="${makeFlags} CUDA_ARCH=8.0"
 				;;
@@ -77,7 +77,7 @@ runTimeTest() {
 		esac
 
 		if [ ${amrMaxLevel} -gt 0 ]; then
-			outfile=${outfile}_AMR_$(echo ${refRatio} | sed 's/ /-/g')_BF-${blockingFactor}
+			outfile=${outfile}_${amrMaxLevel}Lev
 		fi
 
 		outfile=${outfile}_${run}
@@ -143,20 +143,16 @@ if [ "${#}" == "0" ]; then
 	#for testname in "${mpiOmpTest}"; do
 	#for res in 64; do
 		res=64
-		refRatio="2 2 2 2"
-		amrMaxLevel=$(echo ${refRatio} | wc -w)
+		effective=1024
+		refRatio="2"
+		amrMaxLevel=$(printf %.0f $(echo "l(${effective}/${res})/l(2)" | bc -l))
+		echo "${amrMaxLevel} LEVELS"
 		blockingFactor=8
-		maxGridSize=128
-		steps=$(((maxGridSize / blockingFactor) - 1))
+		maxGridSize=${res}
 		#for testname in "${mpiCudaTest}"; do
 		#for testname in "${mpiTest}" "${ompTest}" "${mpiOmpTest}" ; do
 		for testname in "${mpiTest}"; do
-			bf=4
-
-			while [ ${bf} -le $((res / 2)) ]; do
-				bf=$((bf * 2))
-				blockingFactor=${bf} runTimeTest "${testname}" ${res}
-			done
+			runTimeTest "${testname}" ${res}
 		done
 	#done
 
