@@ -62,7 +62,7 @@ runTimeTest() {
                                 export OMP_WAIT_POLICY=active
                                 export OMP_PROC_BIND=false
                                 export OMP_DISPLAY_ENV=true
-                                outfile=time_OMP_${ompThreads}_${res}
+                                outfile=time_OMP-${ompThreads}_${res}
                                 ;;
 
                         ${cuda1Test})
