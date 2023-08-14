@@ -1,4 +1,4 @@
-DIM = 2
+DIM = 3
 
 TINY_PROFILE = FALSE
 

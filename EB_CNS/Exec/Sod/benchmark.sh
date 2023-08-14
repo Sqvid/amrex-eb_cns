@@ -14,7 +14,7 @@ mpiTest="USE_MPI=TRUE"
 mpiOmpTest="${mpiTest} USE_OMP=TRUE"
 mpiCudaTest="${mpiTest} USE_CUDA=TRUE"
 
-amrMaxLevel=2
+amrMaxLevel=0
 blockingFactor=8
 maxGridSize=128
 refineDengrad=0.02
@@ -22,7 +22,7 @@ refineDengrad=0.02
 runTimeTest() {
 	testname=${1}
 	#resolutions="64 128 256 512 1024 2048 4096"
-	resolutions="128 256 512"
+	resolutions="256"
 
 	# Tests are repeated for different resolutions multiple times.
 	for res in ${resolutions}; do
@@ -102,8 +102,8 @@ runTimeTest() {
 
 if [ "${#}" == "0" ]; then
 	#for testname in "${mpiTest}" "${mpiOmpTest}" "${mpiCudaTest}"; do
-	#for testname in "${mpiOmpTest}"; do
-	for testname in "${mpiTest}" "${mpiOmpTest}"; do
+	for testname in "${mpiTest}"; do
+	#for testname in "${mpiTest}" "${mpiOmpTest}"; do
 		runTimeTest "${testname}"
 	done
 
