@@ -26,7 +26,7 @@ cns_initdata (int i, int j, int k, amrex::Array4<amrex::Real> const& state,
 	auto typ = fa(i, j, k);
 
 	Real w = 0.0141;
-	Real theta = 0.3;
+	Real theta = 0;
 
     const Real* prob_lo = geomdata.ProbLo();
     const Real* dx      = geomdata.CellSize();
@@ -37,7 +37,7 @@ cns_initdata (int i, int j, int k, amrex::Array4<amrex::Real> const& state,
 	Real xRot {}, yRot {}, xFulc {0}, yFulc {0};
 	xRot = (x - xFulc)*std::cos(theta) + (y - yFulc)*std::sin(theta);
 
-    Real Pt, rhot, uxt, uyt;
+    Real Pt {}, rhot {}, uxt {}, uyt {}, uzt {};
 	Pt = prob_parm.p_r;
 	Real v = prob_parm.u_r;
 
@@ -45,36 +45,37 @@ cns_initdata (int i, int j, int k, amrex::Array4<amrex::Real> const& state,
 
 	// Incline-pipe initial condition.
 	// If the cell is covered then do not set it to a gaussian value.
-//	if (typ.isCovered()) {
-//		rhot = rho0;
-//
-//	} else {
-//		Real g = (xRot - d) / (Real(0.5) * w);
-//		rhot = rho0 + std::exp(-g*g);
-//	}
-//
-//	uxt = v * std::cos(theta);
-//	uyt = v * std::sin(theta);
+	//if (typ.isCovered()) {
+	//	rhot = rho0;
+
+	//} else {
+	//	Real g = (xRot - d) / (Real(0.5) * w);
+	//	rhot = rho0 + std::exp(-g*g);
+	//}
+
+	//uxt = v * std::cos(theta);
+	//uyt = v * std::sin(theta);
 
 	// Riemann initial condition.
 	if (x < 0.1) {
 		Pt = prob_parm.p_l;
 		rhot = prob_parm.rho_l;
 		uxt = prob_parm.u_l;
-		uyt = 0;
 	} else {
 		Pt = prob_parm.p_r;
 		rhot = prob_parm.rho_r;
 		uxt = prob_parm.u_r;
-		uyt = 0;
 	}
 
     state(i,j,k,URHO) = rhot;
     state(i,j,k,UMX) = rhot*uxt;
     state(i,j,k,UMY) = rhot*uyt;
+#if (AMREX_SPACEDIM == 3)
+    state(i,j,k,UMZ) = rhot*uzt;
+#endif
     Real et = Pt/(parm.eos_gamma-Real(1.0));
     state(i,j,k,UEINT) = et;
-    state(i,j,k,UEDEN) = et + Real(0.5)*rhot*(uxt*uxt + uyt*uyt);
+    state(i,j,k,UEDEN) = et + Real(0.5)*rhot*(uxt*uxt + uyt*uyt + uzt*uzt);
     state(i,j,k,UTEMP) = Real(0.0);
 }
 

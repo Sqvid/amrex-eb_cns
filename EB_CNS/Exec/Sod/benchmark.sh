@@ -4,7 +4,7 @@ export PATH=$(echo $PATH | sed s/cuda-11.2/cuda-12.1/g)
 
 # Parallelisation parameters.
 nCores=32
-dim=2
+dim=3
 makeFlags="-j ${nCores} DIM=${dim}"
 
 mpiBin=./CNS${dim}d.gnu.MPI.ex
@@ -18,18 +18,13 @@ ompTest="USE_MPI=FALSE USE_OMP=TRUE"
 cuda1Test="USE_MPI=TRUE USE_CUDA=TRUE"
 cuda2Test="${cuda1Test} IGNORETHISVAR=FOO"
 
-nRuns=3
+nRuns=1
 
-#refRatio="2 2 2 2"
-#amrMaxLevel=0
-#amrMaxLevel=$(echo ${refRatio} | wc -w)
-#echo "${amrMaxLevel} LEVELS"
-blockingFactor=8
-#maxGridSize=128
 gridEff=0.8
 refineDengrad=0.005
 
 runTimeTest() {
+	echo "MAX GRID SIZE: ${maxGridSize}"
         testname=${1}
         res=${2}
 
@@ -89,8 +84,6 @@ runTimeTest() {
 
                 outfile=${outfile}_${run}
 
-                make ${makeFlags} ${testname}
-
                 if [ ${?} -ne 0 ]; then
                         echo "Build for ${testname} failed."
                         exit 1
@@ -101,6 +94,8 @@ runTimeTest() {
                         echo "Skipping..."
                         continue
                 fi
+
+                make ${makeFlags} ${testname}
 
                 echo "" | tee ${outfile}
                 echo "${testname}: ${res}x${res}, RUN: ${run}" | tee ${outfile}
@@ -115,8 +110,9 @@ runTimeTest() {
                         bin="mpiexec -n ${mpiProcs} ${mpiExtraOpts} ${bin}"
                 fi
 
+		#eb2.geom_type=schardin \
+
                 ${bin} inputs \
-			eb2.geom_type=schardin \
                         max_step="-1" stop_time="0.0002" \
                         eb2.build_coarse_level_by_coarsening="false" \
                         cns.do_visc="false" cns.eb_weights_type=3 \
@@ -145,21 +141,24 @@ runTimeTest() {
 
 if [ "${#}" == "0" ]; then
         #for res in 64 128 256 512 1024 2048 4096; do
-        for res in 64 128 256 512; do
+        for res in 64; do
 		echo ${res}
-                effective=1024
+                #effective=${res}
                 refRatio="2"
-                amrMaxLevel=$(printf %.0f $(echo "l(${effective}/${res})/l(2)" | bc -l))
+                #amrMaxLevel=$(printf %.0f $(echo "l(${effective}/${res})/l(2)" | bc -l))
+		amrMaxLevel=2
                 echo "${amrMaxLevel} LEVELS"
                 blockingFactor=8
-                maxGridSize=128
+		maxGridSize=32
 
+                #for testname in "${mpiTest}" "${ompTest}" "${mpiOmpTest}"; do
                 for testname in "${mpiTest}" "${ompTest}" "${mpiOmpTest}" "${cuda1Test}" "${cuda2Test}"; do
 			runTimeTest "${testname}" ${res}
                 done
         done
 
 elif [ "${1}" == "clean" ]; then
+	rm -vf Backtrace.*
         rm -vf time_MPI*
         rm -vf time_OMP*
         rm -vf time_CUDA*
