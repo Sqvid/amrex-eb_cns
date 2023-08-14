@@ -18,8 +18,9 @@ ompTest="USE_MPI=FALSE USE_OMP=TRUE"
 cuda1Test="USE_MPI=TRUE USE_CUDA=TRUE"
 cuda2Test="${cuda1Test} IGNORETHISVAR=FOO"
 
-nRuns=1
+nRuns=3
 
+refRatio="2"
 gridEff=0.8
 refineDengrad=0.005
 
@@ -141,12 +142,10 @@ runTimeTest() {
 
 if [ "${#}" == "0" ]; then
         #for res in 64 128 256 512 1024 2048 4096; do
-        for res in 64; do
+        for res in 64 128 256; do
 		echo ${res}
-                #effective=${res}
-                refRatio="2"
-                #amrMaxLevel=$(printf %.0f $(echo "l(${effective}/${res})/l(2)" | bc -l))
-		amrMaxLevel=2
+                effective=512
+                amrMaxLevel=$(printf %.0f $(echo "l(${effective}/${res})/l(2)" | bc -l))
                 echo "${amrMaxLevel} LEVELS"
                 blockingFactor=8
 		maxGridSize=32
