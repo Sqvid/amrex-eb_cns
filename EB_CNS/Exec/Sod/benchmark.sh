@@ -18,7 +18,7 @@ ompTest="USE_MPI=FALSE USE_OMP=TRUE"
 cuda1Test="USE_MPI=TRUE USE_CUDA=TRUE"
 cuda2Test="${cuda1Test} IGNORETHISVAR=FOO"
 
-nRuns=3
+nRuns=1
 
 refRatio="2"
 gridEff=0.8
@@ -150,8 +150,8 @@ if [ "${#}" == "0" ]; then
                 blockingFactor=8
 		maxGridSize=32
 
-                #for testname in "${mpiTest}" "${ompTest}" "${mpiOmpTest}"; do
-                for testname in "${mpiTest}" "${ompTest}" "${mpiOmpTest}" "${cuda1Test}" "${cuda2Test}"; do
+                for testname in "${mpiTest}" "${ompTest}" "${mpiOmpTest}"; do
+                #for testname in "${mpiTest}" "${ompTest}" "${mpiOmpTest}" "${cuda1Test}" "${cuda2Test}"; do
 			runTimeTest "${testname}" ${res}
                 done
         done
