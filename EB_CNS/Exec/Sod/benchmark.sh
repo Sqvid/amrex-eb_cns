@@ -37,8 +37,7 @@ runTimeTest() {
         for run in $(seq ${nRuns}); do
                 case ${testname} in
                         ${mpiTest})
-                                mpiProcs=${threads}
-                                #mpiProcs=${nCores}
+                                mpiProcs=${nCores}
                                 outfile=time_MPI-${mpiProcs}_${res}
                                 bin=${mpiBin}
                                 ;;
@@ -53,13 +52,11 @@ runTimeTest() {
                                 export OMP_PROC_BIND=false
                                 export OMP_DISPLAY_ENV=true
                                 outfile=time_MPI-${mpiProcs}_OMP-${ompThreads}_${res}
-                                #outfile=time_OMP_${ompThreads}_${res}
                                 ;;
 
                         ${ompTest})
                                 bin=${ompBin}
-                                ompThreads=${threads}
-                                #ompThreads=${nCores}
+                                ompThreads=${nCores}
                                 export OMP_NUM_THREADS=${ompThreads}
                                 export OMP_WAIT_POLICY=active
                                 export OMP_PROC_BIND=false
@@ -119,7 +116,7 @@ runTimeTest() {
                 fi
 
                 ${bin} inputs \
-                        eb2.geom_type= schardin \
+			eb2.geom_type=schardin \
                         max_step="-1" stop_time="0.0002" \
                         eb2.build_coarse_level_by_coarsening="false" \
                         cns.do_visc="false" cns.eb_weights_type=3 \
@@ -147,22 +144,18 @@ runTimeTest() {
 }
 
 if [ "${#}" == "0" ]; then
-        for res in 512; do
         #for res in 64 128 256 512 1024 2048 4096; do
+        for res in 64 128 256 512; do
 		echo ${res}
-                effective=${res}
+                effective=1024
                 refRatio="2"
                 amrMaxLevel=$(printf %.0f $(echo "l(${effective}/${res})/l(2)" | bc -l))
                 echo "${amrMaxLevel} LEVELS"
                 blockingFactor=8
                 maxGridSize=128
 
-                #for testname in "${mpiTest}"; do
-                for testname in "${mpiTest}" "${ompTest}"; do
-                #for testname in "${mpiTest}" "${ompTest}" "${mpiOmpTest}" "${cuda1Test}" "${cuda2Test}"; do
-			for i in $(seq ${nCores}); do
-				threads=${i} runTimeTest "${testname}" ${res}
-			done
+                for testname in "${mpiTest}" "${ompTest}" "${mpiOmpTest}" "${cuda1Test}" "${cuda2Test}"; do
+			runTimeTest "${testname}" ${res}
                 done
         done
 
