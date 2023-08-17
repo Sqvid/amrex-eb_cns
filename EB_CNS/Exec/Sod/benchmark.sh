@@ -18,14 +18,14 @@ ompTest="USE_MPI=FALSE USE_OMP=TRUE"
 cuda1Test="USE_MPI=TRUE USE_CUDA=TRUE"
 cuda2Test="${cuda1Test} IGNORETHISVAR=FOO"
 
-nRuns=1
+nRuns=3
 
 refRatio="2"
 gridEff=0.8
 refineDengrad=0.005
 
 runTimeTest() {
-	echo "MAX GRID SIZE: ${maxGridSize}"
+	echo "BLOCKING FACTOR: ${blockingFactor}"
         testname=${1}
         res=${2}
 
@@ -83,7 +83,7 @@ runTimeTest() {
                         outfile=${outfile}_${amrMaxLevel}Lev
                 fi
 
-                outfile=${outfile}_${run}
+                outfile=${outfile}_BF-${blockingFactor}_${run}
 
                 if [ ${?} -ne 0 ]; then
                         echo "Build for ${testname} failed."
@@ -142,18 +142,24 @@ runTimeTest() {
 
 if [ "${#}" == "0" ]; then
         #for res in 64 128 256 512 1024 2048 4096; do
-        for res in 64 128 256; do
+        for res in 128; do
 		echo ${res}
-                effective=512
+		effective=$((res * 2))
                 amrMaxLevel=$(printf %.0f $(echo "l(${effective}/${res})/l(2)" | bc -l))
                 echo "${amrMaxLevel} LEVELS"
-                blockingFactor=8
-		maxGridSize=32
+		#blockingFactor=8
+		maxGridSize=${res}
+		bf=8
 
-                for testname in "${mpiTest}" "${ompTest}" "${mpiOmpTest}"; do
+		#for testname in "${cuda1Test}" "${cuda2Test}"; do
                 #for testname in "${mpiTest}" "${ompTest}" "${mpiOmpTest}" "${cuda1Test}" "${cuda2Test}"; do
-			runTimeTest "${testname}" ${res}
-                done
+		while [ ${bf} -le ${res} ]; do
+			for testname in "${mpiTest}" "${ompTest}" "${mpiOmpTest}"; do
+				blockingFactor=${bf} runTimeTest "${testname}" ${res}
+			done
+
+			bf=$((bf * 2))
+		done
         done
 
 elif [ "${1}" == "clean" ]; then
