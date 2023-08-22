@@ -4,7 +4,7 @@ export PATH=$(echo $PATH | sed s/cuda-11.2/cuda-12.1/g)
 
 # Parallelisation parameters.
 nCores=32
-dim=3
+dim=2
 makeFlags="-j ${nCores} DIM=${dim}"
 
 mpiBin=./CNS${dim}d.gnu.MPI.ex
@@ -25,7 +25,7 @@ gridEff=0.8
 refineDengrad=0.005
 
 runTimeTest() {
-	echo "BLOCKING FACTOR: ${blockingFactor}"
+	echo "MAX GRID SIZE: ${maxGridSize}"
         testname=${1}
         res=${2}
 
@@ -83,7 +83,7 @@ runTimeTest() {
                         outfile=${outfile}_${amrMaxLevel}Lev
                 fi
 
-                outfile=${outfile}_BF-${blockingFactor}_${run}
+                outfile=${outfile}_MGS-${maxGridSize}_${run}
 
                 if [ ${?} -ne 0 ]; then
                         echo "Build for ${testname} failed."
@@ -111,9 +111,8 @@ runTimeTest() {
                         bin="mpiexec -n ${mpiProcs} ${mpiExtraOpts} ${bin}"
                 fi
 
-		#eb2.geom_type=schardin \
-
                 ${bin} inputs \
+			eb2.geom_type=schardin \
                         max_step="-1" stop_time="0.0002" \
                         eb2.build_coarse_level_by_coarsening="false" \
                         cns.do_visc="false" cns.eb_weights_type=3 \
@@ -142,23 +141,25 @@ runTimeTest() {
 
 if [ "${#}" == "0" ]; then
         #for res in 64 128 256 512 1024 2048 4096; do
-        for res in 128; do
+        for res in 1024; do
 		echo ${res}
-		effective=$((res * 2))
+		effective=${res}
                 amrMaxLevel=$(printf %.0f $(echo "l(${effective}/${res})/l(2)" | bc -l))
                 echo "${amrMaxLevel} LEVELS"
-		#blockingFactor=8
-		maxGridSize=${res}
-		bf=8
+		blockingFactor=8
+		#maxGridSize=32
+		mgs=128
 
 		#for testname in "${cuda1Test}" "${cuda2Test}"; do
                 #for testname in "${mpiTest}" "${ompTest}" "${mpiOmpTest}" "${cuda1Test}" "${cuda2Test}"; do
-		while [ ${bf} -le ${res} ]; do
-			for testname in "${mpiTest}" "${ompTest}" "${mpiOmpTest}"; do
-				blockingFactor=${bf} runTimeTest "${testname}" ${res}
+		#for testname in "${mpiTest}" "${ompTest}" "${mpiOmpTest}"; do
+
+		while [ ${mgs} -le ${res} ]; do
+			for testname in "${cuda1Test}" "${cuda2Test}"; do
+				maxGridSize=${mgs} runTimeTest "${testname}" ${res}
 			done
 
-			bf=$((bf * 2))
+			mgs=$((mgs * 2))
 		done
         done
 

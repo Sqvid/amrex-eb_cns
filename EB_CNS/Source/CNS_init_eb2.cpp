@@ -47,9 +47,13 @@ initialize_EB2 (const Geometry& geom, const int /*required_coarsening_level*/,
         EB2::PlaneIF upperSlope(triangleTip, upperNorm);
         EB2::PlaneIF lowerSlope(triangleTip, lowerNorm);
 
+#if (AMReX_SPACEDIM == 3)
+        auto finalShape = EB2::lathe(EB2::makeIntersection(box, upperSlope, lowerSlope));
+#else
         auto finalShape = EB2::makeIntersection(box, upperSlope, lowerSlope);
-
+#endif
         auto gshop = EB2::makeShop(finalShape);
+
         EB2::Build(gshop, geom, max_coarsening_level, max_coarsening_level, 4, build_coarse_level_by_coarsening);
     } else if (geom_type == "pipe") {
         Real W = 0.0141;

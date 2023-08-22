@@ -1,7 +1,7 @@
 amrex.fpe_trap_invalid=1
 
 max_step  = -1
-stop_time = 0.0002
+stop_time = 0.000102
 
 geometry.is_periodic = 0 0 0
 geometry.coord_sys = 0  # 0 => cart, 1 => RZ  2=>spherical
@@ -41,6 +41,8 @@ eb2.sphere_has_fluid_inside = 0
 #eb2.parser_function = "abs((y - 0.05) - x*tan(0.3)) - (0.0141/cos(0.3))"
 #eb2.parser_function = "abs((y - 0.05) - x*tan(0.1)) - (0.0141/cos(0.1))"
 #eb2.parser_function = "abs(y - 0.1) - 0.0141"
+#eb2.parser_function = "if(((x > 0.1) and (x <= (0.1 + 0.02*cos(3.141592654 / 6)))
+#and ((((x-0.1)*tan(3.141592654/6))) >= sqrt(((y- 0.1)^2) + ((z - 0.1)^2)))), 1, -1)"
 
 #eb2.extend_domain_face=0
 eb2.build_coarse_level_by_coarsening=false
